@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vim Editor Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1a1a;
+            color: white;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .vim-editor {
+            position: relative;
+            margin: 20px 0;
+        }
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            background: #2d2d2d;
+            color: white;
+            border: 2px solid #555;
+            border-radius: 8px;
+            padding: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            resize: vertical;
+        }
+        .mode-normal { border-color: #fbbf24; }
+        .mode-insert { border-color: #10b981; }
+        .mode-visual { border-color: #3b82f6; }
+        
+        .mode-indicator {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(0,0,0,0.8);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .instructions {
+            background: #333;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .instructions h3 {
+            color: #fbbf24;
+            margin-top: 0;
+        }
+        
+        .command-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            font-family: monospace;
+        }
+        
+        button {
+            background: #7c3aed;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        button:hover {
+            background: #6d28d9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Vim Yank Mode Test</h1>
+        
+        <div class="instructions">
+            <h3>🎮 Vim Commands Available:</h3>
+            <div class="command-list">
+                <div><strong>i</strong> - Enter insert mode</div>
+                <div><strong>Escape</strong> - Enter normal mode</div>
+                <div><strong>yy</strong> - Yank current line</div>
+                <div><strong>yw</strong> - Yank word</div>
+                <div><strong>y$</strong> - Yank to end of line</div>
+                <div><strong>y0</strong> - Yank to start of line</div>
+                <div><strong>p</strong> - Paste after cursor</div>
+                <div><strong>P</strong> - Paste before cursor</div>
+                <div><strong>v</strong> - Visual mode</div>
+                <div><strong>h/j/k/l</strong> - Move cursor</div>
+                <div><strong>w/b/e</strong> - Word navigation</div>
+                <div><strong>0/$</strong> - Line start/end</div>
+            </div>
+        </div>
+
+        <div class="vim-editor">
+            <textarea id="vimTextarea" placeholder="Start typing or press 'i' for insert mode...">Hello vim world!
+This is a test of the vim yank functionality.
+Try yanking this line with 'yy'
+Then paste it with 'p'</textarea>
+            <div class="mode-indicator" id="modeIndicator">NORMAL</div>
+        </div>
+        
+        <div>
+            <button onclick="clearText()">Clear</button>
+            <button onclick="addSampleText()">Add Sample Text</button>
+            <button onclick="showRegisters()">Show Yanked Content</button>
+        </div>
+        
+        <div id="registerContent" style="margin-top: 20px; background: #333; padding: 10px; border-radius: 4px; display: none;">
+            <h4>Yanked Content:</h4>
+            <pre id="registerDisplay"></pre>
+        </div>
+    </div>
+
+    <script>
+        class VimEditor {
+            constructor(textarea) {
+                this.textarea = textarea;
+                this.mode = 'normal';
+                this.registers = { '"': '', '0': '' };
+                this.commandBuffer = '';
+                this.modeIndicator = document.getElementById('modeIndicator');
+                
+                this.textarea.addEventListener('keydown', this.handleKeyDown.bind(this));
+                this.textarea.addEventListener('input', this.handleInput.bind(this));
+                
+                this.updateModeDisplay();
+                this.textarea.focus();
+            }
+            
+            handleKeyDown(e) {
+                if (this.mode === 'insert' && e.key !== 'Escape') {
+                    return; // Let normal typing through
+                }
+                
+                e.preventDefault();
+                this.handleVimCommand(e.key, e.shiftKey, e.ctrlKey);
+            }
+            
+            handleInput(e) {
+                // Only allow input in insert mode
+                if (this.mode !== 'insert') {
+                    e.preventDefault();
+                }
+            }
+            
+            handleVimCommand(key, shiftKey, ctrlKey) {
+                const pos = this.textarea.selectionStart;
+                const text = this.textarea.value;
+                
+                switch (this.mode) {
+                    case 'normal':
+                        this.handleNormalMode(key, shiftKey, pos, text);
+                        break;
+                    case 'insert':
+                        if (key === 'Escape') {
+                            this.setMode('normal');
+                            this.setCursor(Math.max(0, pos - 1));
+                        }
+                        break;
+                    case 'visual':
+                        this.handleVisualMode(key, pos, text);
+                        break;
+                }
+            }
+            
+            handleNormalMode(key, shiftKey, pos, text) {
+                // Motion commands
+                switch (key) {
+                    case 'h': this.setCursor(Math.max(0, pos - 1)); return;
+                    case 'l': this.setCursor(Math.min(text.length, pos + 1)); return;
+                    case 'j': this.moveVertical(1); return;
+                    case 'k': this.moveVertical(-1); return;
+                    case 'w': this.setCursor(this.moveWordForward(pos)); return;
+                    case 'b': this.setCursor(this.moveWordBackward(pos)); return;
+                    case 'e': this.setCursor(this.moveWordForward(pos) - 1); return;
+                    case '$': this.setCursor(this.moveToLineEnd(pos)); return;
+                    case '0': this.setCursor(this.moveToLineStart(pos)); return;
+                }
+                
+                // Handle yank commands
+                if (this.commandBuffer === 'y') {
+                    switch (key) {
+                        case 'y': this.yankLine(pos); break;
+                        case 'w': this.yankWord(pos); break;
+                        case '$': this.yankToLineEnd(pos); break;
+                        case '0': this.yankToLineStart(pos); break;
+                    }
+                    this.commandBuffer = '';
+                    return;
+                }
+                
+                // Other commands
+                switch (key) {
+                    case 'i': this.setMode('insert'); break;
+                    case 'a': this.setCursor(pos + 1); this.setMode('insert'); break;
+                    case 'A': this.setCursor(this.moveToLineEnd(pos)); this.setMode('insert'); break;
+                    case 'I': this.setCursor(this.moveToLineStart(pos)); this.setMode('insert'); break;
+                    case 'o': this.openLineBelow(pos); break;
+                    case 'O': this.openLineAbove(pos); break;
+                    case 'v': this.setMode('visual'); this.setSelection(pos, pos); break;
+                    case 'y': this.commandBuffer = 'y'; break;
+                    case 'p': this.paste(pos, false); break;
+                    case 'P': this.paste(pos, true); break;
+                }
+            }
+            
+            handleVisualMode(key, pos, text) {
+                switch (key) {
+                    case 'Escape':
+                        this.setMode('normal');
+                        this.clearSelection();
+                        break;
+                    case 'y':
+                        this.yankSelection();
+                        this.setMode('normal');
+                        this.clearSelection();
+                        break;
+                }
+            }
+            
+            // Movement methods
+            moveWordForward(pos) {
+                const text = this.textarea.value;
+                const match = text.slice(pos).match(/\\s*\\S+/);
+                return match ? pos + match[0].length : text.length;
+            }
+            
+            moveWordBackward(pos) {
+                const text = this.textarea.value;
+                const beforeCursor = text.slice(0, pos);
+                const match = beforeCursor.match(/\\S+\\s*$/);
+                return match ? pos - match[0].length : 0;
+            }
+            
+            moveToLineEnd(pos) {
+                const text = this.textarea.value;
+                const lineEnd = text.indexOf('\\n', pos);
+                return lineEnd === -1 ? text.length : lineEnd;
+            }
+            
+            moveToLineStart(pos) {
+                const text = this.textarea.value;
+                return text.lastIndexOf('\\n', pos - 1) + 1;
+            }
+            
+            moveVertical(direction) {
+                const pos = this.textarea.selectionStart;
+                const text = this.textarea.value;
+                const lines = text.split('\\n');
+                
+                let currentLine = 0;
+                let charCount = 0;
+                
+                for (let i = 0; i < lines.length; i++) {
+                    if (charCount + lines[i].length >= pos) {
+                        currentLine = i;
+                        break;
+                    }
+                    charCount += lines[i].length + 1; // +1 for newline
+                }
+                
+                const columnPos = pos - charCount;
+                const targetLine = currentLine + direction;
+                
+                if (targetLine >= 0 && targetLine < lines.length) {
+                    const targetCharCount = lines.slice(0, targetLine).reduce((acc, line) => acc + line.length + 1, 0);
+                    const newPos = Math.min(targetCharCount + columnPos, targetCharCount + lines[targetLine].length);
+                    this.setCursor(newPos);
+                }
+            }
+            
+            // Yank methods
+            yankLine(pos) {
+                const text = this.textarea.value;
+                const lineStart = this.moveToLineStart(pos);
+                const lineEnd = this.moveToLineEnd(pos);
+                const lineText = text.slice(lineStart, lineEnd) + '\\n';
+                this.yank(lineText);
+            }
+            
+            yankWord(pos) {
+                const text = this.textarea.value;
+                const wordEnd = this.moveWordForward(pos);
+                const wordText = text.slice(pos, wordEnd);
+                this.yank(wordText);
+            }
+            
+            yankToLineEnd(pos) {
+                const text = this.textarea.value;
+                const lineEnd = this.moveToLineEnd(pos);
+                const lineText = text.slice(pos, lineEnd);
+                this.yank(lineText);
+            }
+            
+            yankToLineStart(pos) {
+                const text = this.textarea.value;
+                const lineStart = this.moveToLineStart(pos);
+                const lineText = text.slice(lineStart, pos);
+                this.yank(lineText);
+            }
+            
+            yankSelection() {
+                const start = this.textarea.selectionStart;
+                const end = this.textarea.selectionEnd;
+                const selectedText = this.textarea.value.slice(start, end);
+                this.yank(selectedText);
+            }
+            
+            yank(text) {
+                this.registers['"'] = text;
+                this.registers['0'] = text;
+                console.log('Yanked:', text);
+            }
+            
+            paste(pos, before) {
+                const text = this.registers['"'];
+                if (!text) return;
+                
+                const currentValue = this.textarea.value;
+                const insertPos = before ? pos : pos + 1;
+                const newValue = currentValue.slice(0, insertPos) + text + currentValue.slice(insertPos);
+                
+                this.textarea.value = newValue;
+                this.setCursor(insertPos + text.length - 1);
+            }
+            
+            // Utility methods
+            setMode(mode) {
+                this.mode = mode;
+                this.updateModeDisplay();
+            }
+            
+            setCursor(pos) {
+                this.textarea.setSelectionRange(pos, pos);
+                this.textarea.focus();
+            }
+            
+            setSelection(start, end) {
+                this.textarea.setSelectionRange(start, end);
+            }
+            
+            clearSelection() {
+                const pos = this.textarea.selectionStart;
+                this.setCursor(pos);
+            }
+            
+            updateModeDisplay() {
+                const indicator = this.modeIndicator;
+                indicator.textContent = this.mode.toUpperCase();
+                
+                this.textarea.className = `mode-${this.mode}`;
+                
+                if (this.commandBuffer) {
+                    indicator.textContent += `:${this.commandBuffer}`;
+                }
+            }
+            
+            openLineBelow(pos) {
+                const text = this.textarea.value;
+                const lineEnd = this.moveToLineEnd(pos);
+                const newValue = text.slice(0, lineEnd) + '\\n' + text.slice(lineEnd);
+                this.textarea.value = newValue;
+                this.setCursor(lineEnd + 1);
+                this.setMode('insert');
+            }
+            
+            openLineAbove(pos) {
+                const text = this.textarea.value;
+                const lineStart = this.moveToLineStart(pos);
+                const newValue = text.slice(0, lineStart) + '\\n' + text.slice(lineStart);
+                this.textarea.value = newValue;
+                this.setCursor(lineStart);
+                this.setMode('insert');
+            }
+        }
+        
+        // Initialize vim editor
+        const textarea = document.getElementById('vimTextarea');
+        const vimEditor = new VimEditor(textarea);
+        
+        // Helper functions
+        function clearText() {
+            textarea.value = '';
+            textarea.focus();
+        }
+        
+        function addSampleText() {
+            textarea.value = `Hello vim world!
+This is a test of the vim yank functionality.
+Try yanking this line with 'yy'
+Then paste it with 'p'
+Use 'yw' to yank words
+Use 'y$' to yank to end of line`;
+            textarea.focus();
+        }
+        
+        function showRegisters() {
+            const registerDiv = document.getElementById('registerContent');
+            const registerDisplay = document.getElementById('registerDisplay');
+            
+            registerDisplay.textContent = `Default register ("): ${JSON.stringify(vimEditor.registers['"'])}
+Yank register (0): ${JSON.stringify(vimEditor.registers['0'])}`;
+            
+            registerDiv.style.display = registerDiv.style.display === 'none' ? 'block' : 'none';
+        }
+    </script>
+</body>
+</html>

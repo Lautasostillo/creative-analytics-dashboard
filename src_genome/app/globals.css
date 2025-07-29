@@ -1,0 +1,107 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 11% 15%;
+    --foreground: 0 0% 98%;
+    --card: 215 16% 17%;
+    --card-foreground: 0 0% 98%;
+    --popover: 215 16% 17%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 340 82% 52%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 215 16% 20%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 215 16% 20%;
+    --muted-foreground: 0 0% 65%;
+    --accent: 340 82% 52%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 215 16% 25%;
+    --input: 215 16% 20%;
+    --ring: 340 82% 52%;
+    --chart-1: 340 82% 52%;
+    --chart-2: 280 65% 60%;
+    --chart-3: 200 70% 50%;
+    --chart-4: 160 60% 45%;
+    --chart-5: 30 80% 55%;
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 210 11% 15%;
+    --foreground: 0 0% 98%;
+    --card: 215 16% 17%;
+    --card-foreground: 0 0% 98%;
+    --popover: 215 16% 17%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 340 82% 52%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 215 16% 20%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 215 16% 20%;
+    --muted-foreground: 0 0% 65%;
+    --accent: 340 82% 52%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 215 16% 25%;
+    --input: 215 16% 20%;
+    --ring: 340 82% 52%;
+    --chart-1: 340 82% 52%;
+    --chart-2: 280 65% 60%;
+    --chart-3: 200 70% 50%;
+    --chart-4: 160 60% 45%;
+    --chart-5: 30 80% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer components {
+  .tech-font {
+    font-family: "JetBrains Mono", "Fira Code", "Consolas", monospace;
+  }
+
+  .gradient-button {
+    background: linear-gradient(135deg, #e91e63 0%, #ad1457 100%);
+    border: none;
+    color: white;
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+
+  .gradient-button:hover {
+    background: linear-gradient(135deg, #f06292 0%, #c2185b 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 25px rgba(233, 30, 99, 0.3);
+  }
+
+  .sidebar-item-active {
+    background: linear-gradient(135deg, #e91e63 0%, #ad1457 100%);
+    color: white;
+    font-weight: 600;
+  }
+
+  .card-hover {
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+  }
+
+  .card-hover:hover {
+    border-color: rgba(233, 30, 99, 0.3);
+    box-shadow: 0 8px 32px rgba(233, 30, 99, 0.1);
+    transform: translateY(-2px);
+  }
+}
