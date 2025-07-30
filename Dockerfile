@@ -14,6 +14,11 @@ RUN pnpm run build         # genera .next/
 FROM node:20-alpine AS runner
 WORKDIR /app
 
+# Install pnpm and production dependencies
+RUN corepack enable
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile --prod
+
 # Archivos necesarios para el server
 COPY --from=builder /app/.next/standalone ./
 
@@ -22,4 +27,4 @@ COPY --from=builder /app/.next/static     ./.next/static
 COPY --from=builder /app/public           ./public
 
 ENV NODE_ENV=production
-CMD ["node", "server.js"]
+CMD ["pnpm", "start"]
