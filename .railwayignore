@@ -1,0 +1,26 @@
+# Archivos innecesarios para Railway
+venv/
+api/
+scripts/
+data/
+src_genome/
+src/
+*.py
+*.parquet
+*.duckdb
+*.xlsx
+*.csv
+render.yaml
+
+# Cache y build local
+.next/
+node_modules/.cache/
+.pnpm-store/
+*.log
+.DS_Store
+
+# Archivos de desarrollo
+.env.local
+.env.development
+coverage/
+test-results/
