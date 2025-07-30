@@ -11,53 +11,36 @@ const nextConfig = {
     unoptimized: true,
     domains: ["s3.amazonaws.com"],
   },
-  // Configuración más permisiva para Railway
-  onDemandEntries: {
-    maxInactiveAge: 25 * 1000,
-    pagesBufferLength: 2,
-  },
   experimental: {
     esmExternals: 'loose',
-    forceSwcTransforms: true,
     serverComponentsExternalPackages: ['@duckdb/duckdb-wasm', 'echarts', 'pandas', 'duckdb'],
   },
   poweredByHeader: false,
   compress: true,
-  webpack: (config, { isServer, dev }) => {
+  webpack: (config, { isServer }) => {
+    // Enable WebAssembly support
     config.experiments = { ...config.experiments, asyncWebAssembly: true };
     
-    // Fallbacks más agresivos
-    config.resolve.fallback = {
-      ...config.resolve.fallback,
-      fs: false,
-      path: false,
-      crypto: false,
-      stream: false,
-      util: false,
-      os: false,
-      buffer: false,
-      process: false,
-    };
-    
-    // Solo aplicar optimizaciones en producción
-    if (!dev && !isServer) {
-      config.resolve.alias = {
-        ...config.resolve.alias,
-        '@duckdb/duckdb-wasm': false,
+    // Only add fallbacks for server-side
+    if (isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        path: false,
+        crypto: false,
+        stream: false,
+        util: false,
+        os: false,
+        buffer: false,
+        process: false,
       };
     }
 
-    // Ignorar archivos problemáticos
+    // Handle WASM files
     config.module.rules.push({
-      test: /\.(wasm|node)$/,
+      test: /\.wasm$/,
       type: 'asset/resource',
     });
-
-    // Reducir warnings y errores
-    config.stats = {
-      ...config.stats,
-      warnings: false,
-    };
 
     return config;
   },
