@@ -18,4 +18,4 @@ COPY --from=builder /app/.next/static     ./.next/static
 COPY --from=builder /app/public           ./public
 
 ENV NODE_ENV=production
-CMD ["node", "server.js"]     # o el nombre que imprima next build
+CMD ["node", "server.js"]
