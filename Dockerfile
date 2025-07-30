@@ -4,7 +4,7 @@ FROM node:20-alpine
 WORKDIR /app
 
 # Instalar Python y pip
-RUN apk add --no-cache python3 py3-pip
+RUN apk update && apk add --no-cache python3 py3-pip
 
 # Instalar pnpm
 RUN corepack enable
