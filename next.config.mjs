@@ -17,6 +17,35 @@ const nextConfig = {
   },
   poweredByHeader: false,
   compress: true,
+  
+  // Add headers for DuckDB WASM support
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'Cross-Origin-Embedder-Policy',
+            value: 'require-corp',
+          },
+          {
+            key: 'Cross-Origin-Opener-Policy',
+            value: 'same-origin',
+          },
+        ],
+      },
+      {
+        source: '/data/:path*',
+        headers: [
+          {
+            key: 'Cross-Origin-Resource-Policy',
+            value: 'cross-origin',
+          },
+        ],
+      },
+    ];
+  },
+  
   webpack: (config, { isServer }) => {
     // Enable WebAssembly support
     config.experiments = { ...config.experiments, asyncWebAssembly: true };
