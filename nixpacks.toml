@@ -1,0 +1,3 @@
+[phases.setup]
+aptPkgs = ["git", "git-lfs"]
+cmds = ["git lfs install --local", "git lfs pull"]
