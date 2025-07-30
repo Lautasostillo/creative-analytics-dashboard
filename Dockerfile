@@ -1,5 +1,5 @@
 # Usar la imagen "slim" de Node.js que está basada en Debian
-FROM node:20-slim
+FROM node:20-bullseye-slim
 
 WORKDIR /app
 
