@@ -11,17 +11,24 @@ const nextConfig = {
     unoptimized: true,
     domains: ["s3.amazonaws.com"],
   },
+  // Configuración más permisiva para Railway
+  onDemandEntries: {
+    maxInactiveAge: 25 * 1000,
+    pagesBufferLength: 2,
+  },
   experimental: {
     esmExternals: 'loose',
     optimizeCss: true,
+    forceSwcTransforms: true,
   },
-  // Optimizaciones para reducir el tamaño del bundle
   poweredByHeader: false,
   compress: true,
-  // Excluir dependencias pesadas del servidor
-  serverComponentsExternalPackages: ['@duckdb/duckdb-wasm', 'echarts', 'pandas'],
-  webpack: (config, { isServer }) => {
+  // Excluir dependencias problemáticas
+  serverComponentsExternalPackages: ['@duckdb/duckdb-wasm', 'echarts', 'pandas', 'duckdb'],
+  webpack: (config, { isServer, dev }) => {
     config.experiments = { ...config.experiments, asyncWebAssembly: true };
+    
+    // Fallbacks más agresivos
     config.resolve.fallback = {
       ...config.resolve.fallback,
       fs: false,
@@ -29,21 +36,30 @@ const nextConfig = {
       crypto: false,
       stream: false,
       util: false,
+      os: false,
+      buffer: false,
+      process: false,
     };
     
-    // Optimizar para producción
-    if (!isServer) {
+    // Solo aplicar optimizaciones en producción
+    if (!dev && !isServer) {
       config.resolve.alias = {
         ...config.resolve.alias,
         '@duckdb/duckdb-wasm': false,
       };
     }
 
-    // Excluir archivos grandes del bundle
+    // Ignorar archivos problemáticos
     config.module.rules.push({
       test: /\.(wasm|node)$/,
       type: 'asset/resource',
     });
+
+    // Reducir warnings y errores
+    config.stats = {
+      ...config.stats,
+      warnings: false,
+    };
 
     return config;
   },
