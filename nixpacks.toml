@@ -1,21 +1,14 @@
-# Force Nixpacks (disable Docker)
+# Configuración simple y correcta para Railway
 [variables]
 NIXPACKS_NODE_PACKAGE_MANAGER = "pnpm"
 NODE_ENV = "production"
-DISABLE_DOCKER = "true"
-
-[providers]
-node = "18.x"
-
-[phases.setup]
-nixPkgs = ["nodejs-18_x", "pnpm"]
 
 [phases.build]
 cmds = [
   "corepack enable",
-  "pnpm install --frozen-lockfile", 
+  "pnpm install --frozen-lockfile",
   "pnpm run build"
 ]
 
 [phases.start]
-cmd = "pnpm start -- -p ${PORT:-3000}"
+cmd = "pnpm start"
