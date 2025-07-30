@@ -1,10 +1,10 @@
-# Usar la imagen oficial de Node.js
-FROM node:20-alpine
+# Usar la imagen "slim" de Node.js que está basada en Debian
+FROM node:20-slim
 
 WORKDIR /app
 
-# Instalar Python y pip
-RUN apk update && apk add --no-cache python3 py3-pip
+# Instalar Python y pip usando apt-get
+RUN apt-get update && apt-get install -y python3 python3-pip --no-install-recommends && rm -rf /var/lib/apt/lists/*
 
 # Instalar pnpm
 RUN corepack enable
@@ -26,5 +26,5 @@ RUN pnpm run build
 # Puerto
 EXPOSE 3000
 
-# Comando de inicio - usar pnpm start para que sea consistente
+# Comando de inicio
 CMD ["pnpm", "start"]
