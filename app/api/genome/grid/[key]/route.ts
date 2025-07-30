@@ -7,8 +7,9 @@ export async function GET(
   try {
     const key = decodeURIComponent(params.key);
     
-    // Proxy to FastAPI backend
-    const response = await fetch(`http://localhost:8000/genome/grid/${encodeURIComponent(key)}`);
+    // Proxy to FastAPI backend on Render
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://creative-analytics-dashboard-3.onrender.com';
+    const response = await fetch(`${apiUrl}/genome/grid/${encodeURIComponent(key)}`);
     
     if (!response.ok) {
       throw new Error('Failed to fetch from FastAPI');
