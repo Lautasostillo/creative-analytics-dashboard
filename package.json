@@ -7,7 +7,9 @@
     "dev:genome": "vite --config vite.config.mjs",
     "build": "next build",
     "lint": "next lint",
-    "start": "next start"
+    "start": "next start",
+    "prepare": "husky install",
+    "check-size": "zx ./scripts/check-size.mjs"
   },
   "dependencies": {
     "@duckdb/duckdb-wasm": "1.29.1-dev132.0",
@@ -77,9 +79,12 @@
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@vitejs/plugin-react": "^4.7.0",
+    "fast-glob": "^3.3.3",
+    "husky": "^9.1.7",
     "postcss": "^8.5",
     "tailwindcss": "^3.4.17",
     "typescript": "^5",
-    "vite": "^7.0.6"
+    "vite": "^7.0.6",
+    "zx": "^8.7.2"
   }
 }

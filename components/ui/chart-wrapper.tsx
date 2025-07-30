@@ -9,6 +9,7 @@ import {
   LegendComponent,
   ToolboxComponent,
   DataZoomComponent,
+  VisualMapComponent,
 } from "echarts/components"
 import { LineChart, BarChart, ScatterChart, HeatmapChart } from "echarts/charts"
 import { CanvasRenderer } from "echarts/renderers"
@@ -21,6 +22,7 @@ echarts.use([
   LegendComponent,
   ToolboxComponent,
   DataZoomComponent,
+  VisualMapComponent,
   LineChart,
   BarChart,
   ScatterChart,
@@ -29,7 +31,7 @@ echarts.use([
 ])
 
 interface ChartWrapperProps {
-  option: echarts.EChartsOption
+  option: any
   height?: number
   className?: string
 }
