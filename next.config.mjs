@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Hace que Next empaquete sólo lo necesario
+  output: 'standalone',
   eslint: {
     ignoreDuringBuilds: true,
   },
