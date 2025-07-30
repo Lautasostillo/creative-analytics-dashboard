@@ -45,7 +45,9 @@ export function useDuckDB() {
         URL.revokeObjectURL(worker_url);
         console.log('✅ DuckDB instantiated');
 
-        await newDb.registerFileURL('creatives.parquet', '/data/creatives.parquet', duckdb.DuckDBDataProtocol.HTTP, false);
+        const creativesParquetUrl = `${window.location.origin}/data/creatives.parquet`;
+        console.log('📂 Registering creatives.parquet from:', creativesParquetUrl);
+        await newDb.registerFileURL('creatives.parquet', creativesParquetUrl, duckdb.DuckDBDataProtocol.HTTP, false);
         console.log('✅ creatives.parquet registered');
         
         const conn = await newDb.connect();

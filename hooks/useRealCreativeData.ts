@@ -103,7 +103,9 @@ export function useRealCreativeData() {
         const conn = await db.connect();
         
         // Register grid.parquet file and query it
-        await db.registerFileURL('grid.parquet', '/data/grid.parquet');
+        const gridParquetUrl = `${window.location.origin}/data/grid.parquet`;
+        console.log('📂 Loading parquet from:', gridParquetUrl);
+        await db.registerFileURL('grid.parquet', gridParquetUrl);
         const result = await conn.query('SELECT * FROM read_parquet("grid.parquet")');
         const gridData = result.toArray().map((row: any) => row.toJSON());
         
