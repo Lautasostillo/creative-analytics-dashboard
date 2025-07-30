@@ -1,8 +1,13 @@
+[variables]
+NIXPACKS_NODE_PACKAGE_MANAGER = "pnpm"   # ← fuerza pnpm
+NODE_ENV = "production"
+
 [phases.build]
-cmds = ["npm install", "npm run build"]
+cmds = [
+  "corepack enable",                     # habilita pnpm
+  "pnpm install --frozen-lockfile",
+  "pnpm run build"
+]
 
 [phases.start]
-cmd = "npm start"
-
-[variables]
-NODE_ENV = "production"
+cmd = "pnpm start -- -p ${PORT}"
