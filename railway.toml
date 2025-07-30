@@ -2,10 +2,16 @@
 builder = "nixpacks"
 
 [deploy]
-startCommand = "npm start"
-healthcheckPath = "/"
+startCommand = "pnpm start"
+healthcheckPath = "/api/genome/grid"
 healthcheckTimeout = 300
 restartPolicyType = "on_failure"
 
 [[services]]
-name = "web" 
+name = "web"
+port = 3000
+
+[[services]]
+name = "api"
+port = 8000
+healthcheckPath = "/genome/grid"
