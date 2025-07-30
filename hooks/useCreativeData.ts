@@ -6,12 +6,16 @@ interface CreativeData {
   CTR: number;
   SPEND: number;
   IMPRESSIONS: number;
-  CTR_DELTA: number;
+  CTR_DELTA?: number;
   tone: string;
   persona: string;
   style: string;
   CPC: number;
   conversions?: number;
+  "Ad Name"?: string;
+  TONE?: string;
+  PERSONA?: string;
+  STYLE?: string;
 }
 
 // Data cleaning utilities
@@ -77,7 +81,25 @@ export function useCreativeData() {
       .then(data => {
         if (!Array.isArray(data)) throw new Error('Invalid data format');
         const processedData = data.map((item: any) => {
-          const [rawTone, rawPersona, rawStyle] = item.GRID_KEY.split('|').map((s: string) => s.trim());
+          // Handle both old grid.parquet format and new creatives.parquet format
+          let rawTone, rawPersona, rawStyle;
+          
+          if (item.GRID_KEY) {
+            // Old format: parse from GRID_KEY
+            [rawTone, rawPersona, rawStyle] = item.GRID_KEY.split('|').map((s: string) => s.trim());
+          } else {
+            // New format: use individual fields
+            rawTone = item.TONE || '';
+            rawPersona = item.PERSONA || '';
+            rawStyle = item.STYLE || '';
+          }
+          
+          // Calculate CPC safely
+          const spend = Number(item.SPEND || 0);
+          const impressions = Number(item.IMPRESSIONS || 0);
+          const ctr = Number(item.CTR || 0);
+          const cpc = (impressions * ctr) > 0 ? spend / (impressions * ctr) : 0;
+          
           return {
             ...item,
             tone: cleanTone(rawTone),
@@ -86,8 +108,8 @@ export function useCreativeData() {
             rawTone,
             rawPersona,
             rawStyle,
-            CPC: item.SPEND / (item.IMPRESSIONS * item.CTR), // Correct CPC calculation
-            conversions: Math.round(item.IMPRESSIONS * item.CTR * 0.15) // Estimated conversions
+            CPC: cpc,
+            conversions: Math.round(impressions * ctr * 0.15) // Estimated conversions
           };
         });
         setRawData(processedData);

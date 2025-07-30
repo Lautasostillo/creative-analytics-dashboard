@@ -10,7 +10,8 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 BASE = pathlib.Path("public/data")
-grid = pd.read_parquet(BASE / "grid.parquet")
+# Remove grid.parquet dependency since it's corrupted
+# grid = pd.read_parquet(BASE / "grid.parquet")
 creatives = pd.read_parquet(BASE / "creatives.parquet")
 
 logger.info(f"Loaded creatives.parquet with {len(creatives)} rows and {creatives['GRID_KEY'].nunique()} unique GRID_KEYs")
@@ -21,7 +22,7 @@ logger.info(f"Sample GRID_KEYs: {sample_keys}")
 
 @router.get("/grid")
 async def grid_all():
-    # Return the complete data from creatives.parquet instead of grid.parquet
+    # Return the complete data from creatives.parquet
     # Fix NaN values for JSON serialization
     result = creatives.to_dict(orient="records")
     

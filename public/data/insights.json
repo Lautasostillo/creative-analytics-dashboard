@@ -1,1 +1,37 @@
-[]
+[
+  {
+    "type": "top_performer",
+    "ad_name": "RS_SELF_D69_SeeingDouble_IN2B_16x9",
+    "ctr": 6.02,
+    "spend": 1033.3,
+    "impressions": 133283
+  },
+  {
+    "type": "top_performer",
+    "ad_name": "RS_SELF_D77_BreakRoom_IN1B_BODY4_16x9",
+    "ctr": 5.73,
+    "spend": 14670.6,
+    "impressions": 2536794
+  },
+  {
+    "type": "top_performer",
+    "ad_name": "RS_SELF_D93_Concept_CreditDistraction_IN1A_BODY1_16x9",
+    "ctr": 5.58,
+    "spend": 34184.24,
+    "impressions": 4459568
+  },
+  {
+    "type": "top_performer",
+    "ad_name": "RS_SELF_D77_BreakRoom_IN1B_BODY2_16x9",
+    "ctr": 5.42,
+    "spend": 11337.84,
+    "impressions": 1587978
+  },
+  {
+    "type": "top_performer",
+    "ad_name": "RS_SELF_D73_SelfMagic_IN1A_BODY1_16x9",
+    "ctr": 5.07,
+    "spend": 13706.81,
+    "impressions": 1868614
+  }
+]
