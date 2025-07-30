@@ -20,11 +20,17 @@ export function useDuckDB() {
 
     async function initDB() {
       try {
+        console.log('🔄 Starting DuckDB initialization...');
         const duckdb = await loadDuckDB();
-        if (!duckdb || !isMounted) return;
+        if (!duckdb || !isMounted) {
+          console.log('❌ DuckDB module failed to load');
+          return;
+        }
+        console.log('✅ DuckDB module loaded');
 
         const JSDELIVR_BUNDLES = duckdb.getJsDelivrBundles();
         const bundle = await duckdb.selectBundle(JSDELIVR_BUNDLES);
+        console.log('✅ DuckDB bundle selected');
         
         const worker_url = URL.createObjectURL(
           new Blob([`importScripts("${bundle.mainWorker!}");`], { type: 'text/javascript' })
@@ -33,11 +39,14 @@ export function useDuckDB() {
         const worker = new Worker(worker_url);
         const logger = new duckdb.ConsoleLogger();
         const newDb = new duckdb.AsyncDuckDB(logger, worker);
+        console.log('✅ DuckDB worker created');
         
         await newDb.instantiate(bundle.mainModule, bundle.pthreadWorker);
         URL.revokeObjectURL(worker_url);
+        console.log('✅ DuckDB instantiated');
 
         await newDb.registerFileURL('creatives.parquet', '/data/creatives.parquet', duckdb.DuckDBDataProtocol.HTTP, false);
+        console.log('✅ creatives.parquet registered');
         
         const conn = await newDb.connect();
         await conn.query(`
@@ -45,13 +54,14 @@ export function useDuckDB() {
           SELECT * FROM read_parquet('creatives.parquet');
         `);
         await conn.close();
+        console.log('✅ DuckDB view created successfully');
         
         if (isMounted) {
           setDb(newDb);
         }
       } catch (err) {
         if (isMounted) {
-          console.error("Failed to initialize DuckDB:", err);
+          console.error("❌ Failed to initialize DuckDB:", err);
           setError(err);
         }
       } finally {

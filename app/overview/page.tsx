@@ -50,6 +50,9 @@ export default function Overview() {
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold text-white mb-2">Creative Performance Dashboard</h1>
             <p className="text-slate-400">Loading data...</p>
+            <div className="mt-4 text-xs text-slate-500">
+              Initializing DuckDB and loading Parquet files...
+            </div>
           </div>
         </div>
       </div>
@@ -58,7 +61,20 @@ export default function Overview() {
 
   if (error) {
     console.error('Dashboard error:', error);
-    // Continue with empty data instead of blocking
+    return (
+      <div className="h-full overflow-auto">
+        <div className="p-6">
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold text-white mb-2">Creative Performance Dashboard</h1>
+            <div className="bg-red-900/30 border border-red-500/50 rounded-lg p-4 mt-4">
+              <p className="text-red-400 font-semibold">Error loading data</p>
+              <p className="text-red-300 text-sm mt-2">{error.message || 'Unknown error'}</p>
+              <p className="text-slate-400 text-xs mt-2">Check browser console for details</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const { kpis, tonePerformance, personaPerformance, bestCreative, performanceSpread } = insights || {};
