@@ -12,7 +12,7 @@
     "dev:genome": "vite --config vite.config.mjs",
     "build": "next build",
     "lint": "next lint",
-    "start": "next start",
+    "start": "node .next/standalone/server.js",
     "prepare": "husky install",
     "check-size": "zx ./scripts/check-size.mjs"
   },
