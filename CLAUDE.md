@@ -14,7 +14,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run dev:genome` - Start Vite development server on port 3001 for genome app
 
 ### Python Backend
-- `python main.py` or `uvicorn main:app --reload` - Start FastAPI backend on port 8000
+- `python api/index.py` or `uvicorn api.index:app --reload` - Start FastAPI backend on port 8000
 - Activate virtual environment first: `source venv/bin/activate` (macOS/Linux) or `venv\Scripts\activate` (Windows)
 
 ### Data Processing Scripts
@@ -33,7 +33,7 @@ This is a creative analytics dashboard with dual frontend implementations and a 
 - Both frontends share similar component structures but are separate applications
 
 ### Backend Services
-- **FastAPI Backend**: Python server (`main.py`) serving data APIs
+- **FastAPI Backend**: Python server (`api/index.py`) serving data APIs
 - **API Routes**: Genome-specific endpoints in `api/genome.py`
 - **Data Processing**: Python scripts for ETL and analysis in `scripts/`
 
@@ -70,40 +70,35 @@ This is a creative analytics dashboard with dual frontend implementations and a 
 3. FastAPI backend provides additional API endpoints for complex operations
 4. Multiple visualization layers (charts, tables, genome views) consume processed data
 
----
+## Development Workflow
 
-**"Inicia el servidor con la última versión del Creative Analytics Dashboard que estábamos trabajando. Necesito que:**
+### Starting the Full Stack Application
 
-1. **Active el entorno virtual de Python** (está en la carpeta `venv/`)
-2. **Inicie el backend FastAPI** en el puerto 8000
-3. **Inicie el frontend Next.js** en el puerto 3001
-4. **Verifique que los datos estén funcionando correctamente**
+1. **Activate Python Virtual Environment**:
+   ```bash
+   source venv/bin/activate  # macOS/Linux
+   # or
+   venv\Scripts\activate     # Windows
+   ```
 
-**Los archivos principales que modificamos fueron:**
-- `api/genome.py` - Backend con manejo de NaN y datos completos
-- `hooks/useRealCreativeData.ts` - Hook simplificado para cargar datos
-- `components/gallery/AIAnalysisModal.tsx` - Modal con High Fidelity Description y Scene Breakdown
-- `components/gallery/CardMedia.tsx` - Componente para mostrar videos
+2. **Start Backend Services**:
+   ```bash
+   uvicorn main:app --reload --port 8000
+   ```
 
-**El sistema debería mostrar:**
-- ✅ Videos y thumbnails en la galería
-- ✅ High Fidelity Description y Scene by Scene Breakdown en el modal
-- ✅ Datos completos sin errores 404"
+3. **Start Frontend Applications** (in separate terminals):
+   ```bash
+   # Main Next.js app
+   npm run dev
+   
+   # Alternative Vite genome app
+   npm run dev:genome
+   ```
 
----
+### Key Implementation Notes
 
-**Comandos específicos que el agente debería ejecutar:**
-
-```bash
-# 1. Navegar al directorio del proyecto
-cd /Users/lautarosostillo/Documents/creative-analytics-dashboard
-
-# 2. Activar el entorno virtual
-source venv/bin/activate
-
-# 3. Iniciar el backend FastAPI
-uvicorn main:app --reload --port 8000
-
-# 4. En otra terminal, iniciar el frontend Next.js
-npm run dev -- --port 3001
-```
+- **Data Handling**: Backend (`api/genome.py`) includes robust NaN value handling for JSON serialization
+- **Creative Data**: Frontend hooks (`hooks/useRealCreativeData.ts`) provide simplified data loading patterns
+- **Media Components**: Gallery components support video playback and thumbnail generation
+- **AI Analysis**: Modal components display structured AI analysis including High Fidelity Descriptions and Scene Breakdowns
+- **Cross-Origin**: Backend configured with CORS for development on ports 3001 and 3004
