@@ -63,7 +63,7 @@ for (const dep of prodDeps) {
   }
 }
 
-const depsLimit = 200 * 1024 * 1024; // 200 MB para dependencias
+const depsLimit = 250 * 1024 * 1024; // 250 MB para dependencias (mismo límite que Vercel)
 if (totalDepsSize > depsLimit) {
   console.error(
     `❌  Dependencias de producción pesan ${(totalDepsSize / 1024 / 1024).toFixed(1)} MB (límite 200 MB)`
