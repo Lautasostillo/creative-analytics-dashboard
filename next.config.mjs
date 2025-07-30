@@ -18,13 +18,11 @@ const nextConfig = {
   },
   experimental: {
     esmExternals: 'loose',
-    optimizeCss: true,
     forceSwcTransforms: true,
+    serverComponentsExternalPackages: ['@duckdb/duckdb-wasm', 'echarts', 'pandas', 'duckdb'],
   },
   poweredByHeader: false,
   compress: true,
-  // Excluir dependencias problemáticas
-  serverComponentsExternalPackages: ['@duckdb/duckdb-wasm', 'echarts', 'pandas', 'duckdb'],
   webpack: (config, { isServer, dev }) => {
     config.experiments = { ...config.experiments, asyncWebAssembly: true };
     
