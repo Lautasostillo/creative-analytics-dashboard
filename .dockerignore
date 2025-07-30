@@ -1,0 +1,23 @@
+# Files to ignore in Docker build
+node_modules
+.next
+.git
+.env.local
+.env.development
+venv
+api
+scripts
+data
+src_genome
+src
+*.py
+*.parquet
+*.duckdb
+*.xlsx
+*.csv
+.DS_Store
+*.log
+README.md
+.vercelignore
+.railwayignore
+render.yaml.backup
