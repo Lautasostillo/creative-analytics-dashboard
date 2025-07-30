@@ -1,5 +1,5 @@
-# Usar la imagen oficial de Node.js
-FROM node:20-alpine
+# Multi-stage build para Next.js standalone
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
@@ -18,8 +18,21 @@ COPY . .
 # Build de la aplicación
 RUN pnpm run build
 
+# Etapa de producción
+FROM node:20-alpine AS runner
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV PORT=3000
+
+# Copiar archivos necesarios del build
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/public ./public
+
 # Puerto
 EXPOSE 3000
 
-# Comando de inicio (usando el script de package.json)
-CMD ["pnpm", "start"]
+# Comando de inicio
+CMD ["node", "server.js"]
