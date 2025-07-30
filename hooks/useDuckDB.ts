@@ -1,10 +1,17 @@
 "use client"
 
 import { useEffect, useState } from 'react';
-import * as duckdb from '@duckdb/duckdb-wasm';
+import dynamic from 'next/dynamic';
+
+// Importar DuckDB de forma dinámica para evitar incluirlo en el bundle del servidor
+const loadDuckDB = async () => {
+  if (typeof window === 'undefined') return null;
+  const duckdb = await import('@duckdb/duckdb-wasm');
+  return duckdb;
+};
 
 export function useDuckDB() {
-  const [db, setDb] = useState<duckdb.AsyncDuckDB | null>(null);
+  const [db, setDb] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<any>(null);
 
@@ -13,6 +20,9 @@ export function useDuckDB() {
 
     async function initDB() {
       try {
+        const duckdb = await loadDuckDB();
+        if (!duckdb || !isMounted) return;
+
         const JSDELIVR_BUNDLES = duckdb.getJsDelivrBundles();
         const bundle = await duckdb.selectBundle(JSDELIVR_BUNDLES);
         

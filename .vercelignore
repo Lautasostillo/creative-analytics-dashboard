@@ -1,0 +1,31 @@
+# Archivos grandes que no necesita Vercel
+venv/
+api/
+scripts/
+data/
+src_genome/
+src/
+*.py
+*.parquet
+*.duckdb
+*.xlsx
+*.csv
+
+# Node modules y cache
+node_modules/
+.next/
+.cache/
+.pnpm-store/
+
+# Archivos de desarrollo  
+.env.local
+.env.development
+*.log
+.DS_Store
+*.backup
+*.bak
+
+# Archivos de testing y config local
+coverage/
+.nyc_output/
+test-results/
