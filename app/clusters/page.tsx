@@ -20,6 +20,7 @@ export default function CreativeIntelligencePage() {
 
   // Convert and clean data
   const creatives = useMemo(() => {
+    if (!creativesData || !Array.isArray(creativesData)) return [];
     return creativesData
       .filter(item => item && item.CTR !== undefined && item.CLICKS !== undefined && item.SPEND !== undefined)
       .map(item => ({

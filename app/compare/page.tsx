@@ -22,6 +22,7 @@ export default function ComparePage() {
   
   // Convert RealCreativeData to Creative format for compatibility
   const creatives = useMemo(() => {
+    if (!creativesData || !Array.isArray(creativesData)) return [];
     return creativesData.map(item => ({
       ...item,
       "Ad Name": item["Ad Name"],
