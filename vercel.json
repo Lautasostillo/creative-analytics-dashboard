@@ -1,10 +1,10 @@
 {
-  "builds": [
-    {
-      "src": "api/index.py",
-      "use": "@vercel/python"
+  "functions": {
+    "api/**": {
+      "runtime": "@vercel/python",
+      "excludeFiles": "{.next,node_modules,public,app,components,styles}/**"
     }
-  ],
+  },
   "routes": [
     {
       "src": "/api/(.*)",
