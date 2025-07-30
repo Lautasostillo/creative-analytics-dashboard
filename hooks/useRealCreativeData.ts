@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect, useMemo } from 'react';
+import { useDuckDB } from './useDuckDB';
 
 interface RealCreativeData {
   "#": number;
@@ -90,17 +91,25 @@ export function useRealCreativeData() {
   const [detailedData, setDetailedData] = useState<RealCreativeData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<any>(null);
+  const { db, loading: dbLoading, error: dbError } = useDuckDB();
 
   useEffect(() => {
-    console.log('🔄 Starting data fetch...');
+    if (dbLoading || !db || dbError) return;
     
-    fetch('/api/genome/grid')
-      .then(res => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json();
-      })
-      .then(async (gridData) => {
-        console.log('✅ Grid data fetched:', gridData.length, 'items');
+    console.log('🔄 Starting data fetch from DuckDB...');
+    
+    async function loadData() {
+      try {
+        const conn = await db.connect();
+        
+        // Register grid.parquet file and query it
+        await db.registerFileURL('grid.parquet', '/data/grid.parquet');
+        const result = await conn.query('SELECT * FROM read_parquet("grid.parquet")');
+        const gridData = result.toArray().map((row: any) => row.toJSON());
+        
+        await conn.close();
+        
+        console.log('✅ Grid data fetched from DuckDB:', gridData.length, 'items');
         
         if (!Array.isArray(gridData)) throw new Error('Invalid data format');
         
@@ -163,13 +172,15 @@ export function useRealCreativeData() {
         console.log('✅ Data processing complete:', processedData.length, 'items ready');
         setDetailedData(processedData);
         setLoading(false);
-      })
-      .catch(err => {
+      } catch (err: any) {
         console.error('❌ Data loading error:', err);
         setError(err);
         setLoading(false);
-      });
-  }, []);
+      }
+    }
+    
+    loadData();
+  }, [db, dbLoading, dbError]);
 
   return { data: detailedData, gridData: rawData, loading, error };
 }
