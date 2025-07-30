@@ -3,6 +3,9 @@
     "api/**/*.py": {
       "runtime": "@vercel/python@5.0.0",
       "excludeFiles": "{.next/**,node_modules/**,public/**,app/**,components/**,styles/**}"
+    },
+    "api/*.js": {
+      "excludeFiles": "{node_modules/@tensorflow/**,node_modules/ffmpeg-static/**}"
     }
   },
   "routes": [
