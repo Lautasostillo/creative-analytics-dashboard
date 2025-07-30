@@ -45,16 +45,56 @@ export function useDuckDB() {
         URL.revokeObjectURL(worker_url);
         console.log('✅ DuckDB instantiated');
 
-        const creativesParquetUrl = `${window.location.origin}/data/creatives.parquet`;
-        console.log('📂 Registering creatives.parquet from:', creativesParquetUrl);
-        await newDb.registerFileURL('creatives.parquet', creativesParquetUrl, duckdb.DuckDBDataProtocol.HTTP, false);
-        console.log('✅ creatives.parquet registered');
-        
         const conn = await newDb.connect();
-        await conn.query(`
-          CREATE OR REPLACE VIEW v_creatives AS 
-          SELECT * FROM read_parquet('creatives.parquet');
-        `);
+        try {
+          const creativesParquetUrl = `${window.location.origin}/data/creatives.parquet`;
+          console.log('📂 Loading creatives.parquet from:', creativesParquetUrl);
+
+          // First verify the file exists and get its size
+          const response = await fetch(creativesParquetUrl, { method: 'HEAD' });
+          if (!response.ok) {
+            throw new Error(`Failed to load creatives.parquet: ${response.status} ${response.statusText}`);
+          }
+          
+          const fileSize = response.headers.get('content-length');
+          console.log(`📊 Parquet file size: ${fileSize} bytes`);
+          
+          if (!fileSize || parseInt(fileSize) < 1000) { // Less than 1KB is probably corrupted
+            throw new Error('Parquet file appears to be corrupted or empty');
+          }
+
+          // Register and load the file
+          await newDb.registerFileURL('creatives.parquet', creativesParquetUrl, duckdb.DuckDBDataProtocol.HTTP, false);
+          console.log('✅ creatives.parquet registered');
+
+          // Test query to verify data
+          const testResult = await conn.query('SELECT COUNT(*) as count FROM read_parquet(\'creatives.parquet\')');
+          const countColumn = testResult.getChild('count');
+          if (!countColumn) throw new Error('Failed to get row count from parquet file');
+          const rowCount = countColumn.toArray()[0];
+          console.log(`✅ Verified parquet data: ${rowCount} rows found`);
+
+          // Create the view
+          await conn.query(`
+            CREATE OR REPLACE VIEW v_creatives AS 
+            SELECT * FROM read_parquet('creatives.parquet');
+          `);
+          console.log('✅ DuckDB view created successfully');
+
+          if (isMounted) {
+            setDb(newDb);
+          }
+        } catch (err) {
+          const error = err as Error;
+          console.error('Error initializing DuckDB:', error);
+          if (isMounted) {
+            setError(error);
+            setLoading(false);
+          }
+          throw error;
+        } finally {
+          await conn.close();
+        }
         await conn.close();
         console.log('✅ DuckDB view created successfully');
         
