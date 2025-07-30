@@ -1,2 +1,23 @@
-[build]
-nixpacksVersion = "1.0"
+# nixpacks.toml
+[phases.setup]
+# Install git, git-lfs, Node.js, and Python
+aptPkgs = ["git", "git-lfs"]
+nixPkgs = ["nodejs", "python"]
+cmds = ["git lfs install --local", "git lfs pull"]
+
+[phases.install]
+# Install Node.js and Python dependencies
+cmds = [
+    "pnpm install",
+    "pip install -r api/requirements.txt"
+]
+dependsOn = ["setup"]
+
+[phases.build]
+# Build the Next.js app
+cmds = ["pnpm build"]
+dependsOn = ["install"]
+
+[start]
+# Start both the frontend and backend services
+cmd = "pnpm start"
