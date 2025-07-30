@@ -1,6 +1,10 @@
 # -- build stage -------------------------------------------------------
 FROM node:20-alpine AS builder
 WORKDIR /app
+
+# Force cache invalidation
+ARG CACHEBUST=1
+
 COPY package.json pnpm-lock.yaml ./
 RUN corepack enable && pnpm install --frozen-lockfile
 COPY . .
