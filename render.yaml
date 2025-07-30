@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: creative-analytics-dashboard
+    env: python
+    buildCommand: |
+      # Instalar dependencias de Python
+      pip install -r requirements.txt
+      # Instalar dependencias de Node.js
+      npm install
+      # Build del frontend Next.js como archivos estáticos
+      npm run build
+    startCommand: uvicorn api.index:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 8000
+    healthCheckPath: /
+    autoDeploy: true 

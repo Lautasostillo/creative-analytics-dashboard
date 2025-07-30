@@ -1,7 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Hace que Next empaquete sólo lo necesario
-  output: 'standalone',
+  // Generar archivos estáticos para Render
+  output: 'export',
+  trailingSlash: true,
   eslint: {
     ignoreDuringBuilds: true,
   },
