@@ -9,6 +9,7 @@ import {
   LegendComponent,
   ToolboxComponent,
   DataZoomComponent,
+  VisualMapComponent,
 } from "echarts/components"
 import { LineChart, BarChart, ScatterChart, HeatmapChart } from "echarts/charts"
 import { CanvasRenderer } from "echarts/renderers"
@@ -21,6 +22,7 @@ echarts.use([
   LegendComponent,
   ToolboxComponent,
   DataZoomComponent,
+  VisualMapComponent,
   LineChart,
   BarChart,
   ScatterChart,
@@ -68,7 +70,11 @@ export function ChartWrapper({ option, height = 400, className }: ChartWrapperPr
 
   return (
     <Card className={className}>
-      <div ref={chartRef} style={{ height: `${height}px` }} className="w-full" />
+      <div
+        ref={chartRef}
+        style={{ height: `${height}px` }}
+        className="w-full overflow-visible"
+      />
     </Card>
   )
 }
